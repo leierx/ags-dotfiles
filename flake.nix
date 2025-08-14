@@ -14,7 +14,7 @@
     extraPackages = astalPackages ++ [];
   in {
     packages.${system}.default = pkgs.stdenv.mkDerivation {
-      name = "astal-shell";
+      name = "ags-shell";
       src = ./.;
 
       nativeBuildInputs = with pkgs; [
@@ -31,7 +31,7 @@
         mkdir -p $out/bin
         mkdir -p $out/share
         cp -r * $out/share
-        ags bundle app.tsx $out/bin/astal-shell -d "SRC='$out/share'"
+        ags bundle app.tsx $out/bin/ags-shell -d "SRC='$out/share'"
 
         runHook postInstall
       '';
