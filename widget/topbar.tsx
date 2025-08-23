@@ -117,7 +117,7 @@ function Tray() {
 export default function Topbar({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) {
   return <window
     visible
-    name={"topbar"}
+    name={`topbar-${gdkmonitor.connector}`}
     class={"topbar"}
     gdkmonitor={gdkmonitor}
     exclusivity={Astal.Exclusivity.EXCLUSIVE}
