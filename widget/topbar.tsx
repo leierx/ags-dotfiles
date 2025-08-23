@@ -121,7 +121,8 @@ export default function Topbar({ gdkmonitor }: { gdkmonitor: Gdk.Monitor }) {
     class={"topbar"}
     gdkmonitor={gdkmonitor}
     exclusivity={Astal.Exclusivity.EXCLUSIVE}
-    anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.LEFT | Astal.WindowAnchor.RIGHT}>
+    anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.LEFT | Astal.WindowAnchor.RIGHT}
+    $={(self) => onCleanup(() => self.destroy())}>
     <Gtk.CenterBox>
       <Gtk.Box $type="start">
         <DistroLogo/>

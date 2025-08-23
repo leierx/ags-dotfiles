@@ -3,8 +3,8 @@ import style from "./style/main.scss"
 import Topbar from "./widget/topbar"
 import { execAsync } from "ags/process"
 import { monitorFile } from "ags/file"
-import { Gtk, Gdk } from "ags/gtk4";
-import { For, createBinding } from "ags"
+import { Gdk } from "ags/gtk4"
+import { For, This, createBinding } from "ags"
 
 (async () => {
   const pathsToMonitor = [`${SRC}/style` ]
@@ -34,13 +34,15 @@ import { For, createBinding } from "ags"
   return transpileAndApply()
 })()
 
-const monitors = createBinding(app, "monitors")
-
 function main() {
+  const monitors = createBinding(app, "monitors")
+
   return (
-    <For each={monitors} cleanup={(win: Gtk.Window) => (win as Gtk.Window).destroy()}>
+    <For each={monitors}>
       {(monitor: Gdk.Monitor) => (
-        <Topbar gdkmonitor={monitor}/>
+        <This this={app}>
+          <Topbar gdkmonitor={monitor}/>
+        </This>
       )}
     </For>
   )
