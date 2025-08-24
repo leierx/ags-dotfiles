@@ -17,10 +17,25 @@ function DistroLogo() {
 }
 
 function Workspaces({ monitor }: {monitor: Gdk.Monitor}) {
-  const workspaces = createBinding(hypr, "workspaces").as((w) =>
-    w.filter((wss: AstalHyprland.Workspace) => wss.monitor?.name === monitor.connector && !(wss.id >= -99 && wss.id <= -2)).
-    sort((a: AstalHyprland.Workspace, b: AstalHyprland.Workspace) => a.id - b.id)
-  ); 
+  const workspaces = createBinding(hypr, "workspaces").as((w) => {
+    console.log("raw workspaces update:", w);
+
+    const filtered = w.filter((wss: AstalHyprland.Workspace) => {
+      const mon = typeof wss.monitor === "string" ? wss.monitor : wss.monitor?.name;
+      const keep = mon === monitor.connector && !(wss.id >= -99 && wss.id <= -2);
+      console.log("filter check:", { id: wss.id, mon, want: monitor.connector, keep });
+      return keep;
+    });
+
+    const sorted = filtered.sort((a: AstalHyprland.Workspace, b: AstalHyprland.Workspace) => {
+      const cmp = a.id - b.id;
+      console.log("sort compare:", { a: a.id, b: b.id, result: cmp });
+      return cmp;
+    });
+
+    console.log("final workspace IDs:", sorted.map((ws) => ws.id));
+    return sorted;
+  });
 
   const focused = createBinding(hypr, "focusedWorkspace")
 
