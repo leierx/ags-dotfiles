@@ -17,27 +17,19 @@ function DistroLogo() {
 }
 
 function Workspaces({ monitor }: {monitor: Gdk.Monitor}) {
-  const workspaces = createBinding(hypr, "workspaces").as((w) => {
-    console.log("raw workspaces update:", w);
-
-    const filtered = w.filter((wss: AstalHyprland.Workspace) => {
-      const mon = typeof wss.monitor === "string" ? wss.monitor : wss.monitor?.name;
-      const keep = mon === monitor.connector && !(wss.id >= -99 && wss.id <= -2);
-      console.log("filter check:", { id: wss.id, mon, want: monitor.connector, keep });
-      return keep;
-    });
-
-    const sorted = filtered.sort((a: AstalHyprland.Workspace, b: AstalHyprland.Workspace) => {
-      const cmp = a.id - b.id;
-      console.log("sort compare:", { a: a.id, b: b.id, result: cmp });
-      return cmp;
-    });
-
-    console.log("final workspace IDs:", sorted.map((ws) => ws.id));
-    return sorted;
-  });
+  const widgetMon = monitor.connector
 
   const focused = createBinding(hypr, "focusedWorkspace")
+  const workspaces = createBinding(hypr, "workspaces").as((w: AstalHyprland.Workspace[]) => {
+    const ws_list: Hyprland.Workspace[] = Array.isArray(w) ? w as AstalHyprland.Workspace[] : []
+
+    const filtered_ws_list = ws_list.filter((wss: AstalHyprland.Workspace) => {
+      if (wss.id >= -99 && wss.id <= -2) return false // scratchpad workspaces
+      return wss.monitor?.name === widgetMon // this monitors workspaces only
+    })
+
+    return [...filtered_ws_list].sort((a, b) => a.id - b.id) // ascending order
+  })
 
   return (
     <Gtk.Box class={"workspaces"}>
@@ -45,14 +37,12 @@ function Workspaces({ monitor }: {monitor: Gdk.Monitor}) {
         {(w: AstalHyprland.Workspace, idx) => {
           const clients = createBinding(w, 'clients')
 
-          const cls = createComputed(
-            [focused, clients],
-            (fId, cl): string => {
-              const focused = fId?.id === w.id;
-              const occupied = cl.length > 0;
-              return `${focused ? 'focused ' : ''}${occupied ? 'occupied' : ''}`.trim();
-            },
-          );
+          const cls = createComputed([focused, clients], (fId, cl): string => {
+            const isFocused = fId?.id === w.id
+            const occupied = (Array.isArray(cl) ? cl.length : Number(cl) || 0) > 0
+
+            return `${isFocused ? "focused " : ""}${occupied ? "occupied" : ""}`.trim()
+          })
 
           return (
             <Gtk.Button
