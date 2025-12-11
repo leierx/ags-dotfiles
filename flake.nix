@@ -25,16 +25,7 @@
 
       buildInputs = extraPackages ++ [pkgs.gjs];
 
-      installPhase = ''
-        runHook preInstall
-
-        mkdir -p $out/bin
-        mkdir -p $out/share
-        cp -r * $out/share
-        ags bundle app.tsx $out/bin/ags-shell -d "SRC='$out/share'"
-
-        runHook postInstall
-      '';
+      installPhase = "ags bundle app.ts $out/bin/ags-shell";
     };
   };
 
