@@ -25,7 +25,11 @@
 
       buildInputs = extraPackages ++ [pkgs.gjs];
 
-      installPhase = "ags bundle app.ts $out/bin/ags-shell";
+      installPhase = ''
+        mkdir -p $out/bin
+        ags bundle \
+          app.tsx $out/bin/ags-shell
+      '';
     };
   };
 
